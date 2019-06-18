@@ -1,0 +1,21 @@
+{
+  "teams": [
+    {
+      "id": "d",
+      "name": "Denise",
+      "score": 0,
+      "solos": []
+    },
+    {
+      "id": "m",
+      "name": "Moni",
+      "score": 0,
+      "solos": []
+    }
+  ],
+  "users": [
+    {
+      "id": 0
+    }
+  ]
+}
