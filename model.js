@@ -8,7 +8,11 @@ function getUser(userId, chatId) {
 }
 
 function getTeam(teamId, chatId) {
-  return db.get("chats").find(chatId).get('teams').find({ id: teamId }).value();
+  return db.get('chats').find({ id: chatId }).get('teams').find({ id: teamId }).value();
+}
+
+function getChat(chatId) {
+  return db.get('chats').find({ id: chatId }).value();
 }
 
 /**
@@ -25,6 +29,44 @@ module.exports.addNewChat = function(chatId, userId) {
       
       resolve(true);
     }
+  });
+};
+
+/**
+ * Add score to a team.
+ * @param {string} teamId - ID of the team to add the score.
+ * @param {integer} score - Score to be added.
+ * @param {integer} userId - ID of the user invoking this request.
+ * @param {integer} chatId - ID of chat invoking this request.
+ */
+module.exports.addTeam = function(teamName, teamId, userId, chatId) {
+  // TODO: check if team id already exists
+  return new Promise((resolve, reject) => {
+    const user = getUser(userId, chatId);
+    const chat = getChat(chatId);
+
+    if (teamName === undefined || teamId === undefined){
+      reject('Please define a team name and id.');
+      return;
+    }
+    
+    if (user === undefined) {
+      reject('Error adding score: invalid user');
+      return;
+    }
+    
+    if (chat === undefined) {
+      reject('Please /start the bot first.');
+      return;
+    }
+    
+    db.get("chats")
+      .find({ id: chatId })
+      .get('teams')
+      .push({ id: teamId, name: teamName, score: 0})
+      .write();
+    
+    resolve();
   });
 };
 
@@ -57,7 +99,7 @@ module.exports.addTeamScore = function(teamId, score, userId, chatId) {
     }
     
     db.get("chats")
-      .find(chatId)
+      .find({ id: chatId })
       .get('teams')
       .find({ id: teamId })
       .set('score', team.score + score)
@@ -85,7 +127,7 @@ module.exports.addUser = function(targetId, userId, chatId) {
     }
     
     db.get("chats")
-      .find(chatId)
+      .find({ id: chatId })
       .get('users')
       .push({ id: targetId })
       .write();
@@ -100,6 +142,6 @@ module.exports.addUser = function(targetId, userId, chatId) {
  */
 module.exports.getTeamsModel = function(chatId) {
   return new Promise((resolve, reject) => {
-    resolve(db.get('chats').get(chatId).value());
+    resolve(db.get('chats').find({ id: chatId }).get('teams').value());
   });
 };

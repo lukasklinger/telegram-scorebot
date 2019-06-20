@@ -60,6 +60,7 @@ bot.command('addteam', async ctx => {
   const args = ctx.message.text.split(' ');
   const teamName = args[1];
   const teamId = args[2];
+  const userId = ctx.from.id;
   const chatId = ctx.chat.id;
   
   try {
@@ -67,6 +68,7 @@ bot.command('addteam', async ctx => {
     let message = `*${teamName}* (${teamId}) created.`;
     return ctx.telegram.sendMessage(ctx.chat.id, message, { parse_mode: 'Markdown', reply_to_message_id: ctx.message.message_id });
   } catch (err) {
+    console.log("error: " + err);
     return ctx.reply(err);
   }
 });
@@ -117,7 +119,7 @@ bot.command(['displayscore', 'ds'], async ctx => {
   
   if(teamsModel != undefined){
     teamsModel.forEach(function (team) {
-      message += `${team.name} (${team.id}) - *${team.score}*\n`;
+      message += `${team.name} (${team.id}): *${team.score}*\n`;
     });
   } else {
     message += "No scores yet.";
