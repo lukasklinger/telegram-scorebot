@@ -58,11 +58,11 @@ bot.command(['addscore', 't'], async ctx => {
   const teamId = args[1];
   const score = Number(args[2]);
   const userId = ctx.from.id;
+  const chatId = ctx.chat.id;
  
   try {
-    const res = await Model.addTeamScore(teamId, score, userId);
-    const newScore = res.team.score;
-    const message = `*${res.team.name}* has *${newScore}* points.`;
+    const res = await Model.addTeamScore(teamId, score, userId, chatId);
+    const message = `*${res.team.name}* has *${res.team.score}* points.`;
     return ctx.telegram.sendMessage(ctx.chat.id, message, { parse_mode: 'Markdown', reply_to_message_id: ctx.message.message_id });
   } catch (err) {
     return ctx.reply(err);
@@ -76,9 +76,10 @@ bot.command('adduser', async ctx => {
   const args = ctx.message.text.split(' ');
   const targetId = Number(args[1]);
   const userId = ctx.from.id;
+  const chatId = ctx.chat.id;
   
   try {
-    const newScore = await Model.addUser(targetId, userId);
+    await Model.addUser(targetId, userId, chatId);
     const message = `User ${targetId} has been added`;
     return ctx.reply(message);
   } catch (err) {
@@ -90,12 +91,16 @@ bot.command('adduser', async ctx => {
 bot.command(['displayscore', 'ds'], async ctx => {
   console.log("Getting score.");
   
-  const teamsModel = await Model.getTeamsModel();
+  const teamsModel = await Model.getTeamsModel(ctx.chat.id);
   let message = "Current score: \n";
   
-  teamsModel.forEach(function (team) {
-    message += `${team.name} (${team.id}) - *${team.score}*\n`;
-  });
+  if(teamsModel != undefined){
+    teamsModel.forEach(function (team) {
+      message += `${team.name} (${team.id}) - *${team.score}*\n`;
+    });
+  } else {
+    message += "No scores yet.";
+  }
 
   return ctx.replyWithMarkdown(message);
 });

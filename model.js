@@ -3,12 +3,12 @@ const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync('data/db.json');
 const db = low(adapter);
 
-function getUser(userId) {
-  return db.get('users').find({ id: userId }).value();
+function getUser(userId, chatId) {
+  return db.get('chats').find({ id: chatId }).get('users').find({ id: userId }).value();
 }
 
-function getTeam(teamId) {
-  return db.get('teams').find({ id: teamId }).value();
+function getTeam(teamId, chatId) {
+  return db.get("chats").find(chatId).get('teams').find({ id: teamId }).value();
 }
 
 /**
@@ -16,7 +16,6 @@ function getTeam(teamId) {
  */
 module.exports.addNewChat = function(chatId, userId) {
   return new Promise((resolve, reject) => {
-    // check if chat already exists
     if(db.get("chats").find({ id: chatId }).value() != undefined){
       resolve(false);
     } else {
@@ -34,12 +33,13 @@ module.exports.addNewChat = function(chatId, userId) {
  * @param {string} teamId - ID of the team to add the score.
  * @param {integer} score - Score to be added.
  * @param {integer} userId - ID of the user invoking this request.
+ * @param {integer} chatId - ID of chat invoking this request.
  * @returns {object} - Updated team object.
  */
-module.exports.addTeamScore = function(teamId, score, userId) {
+module.exports.addTeamScore = function(teamId, score, userId, chatId) {
   return new Promise((resolve, reject) => {
-    const user = getUser(userId);
-    const team = getTeam(teamId);
+    const user = getUser(userId, chatId);
+    const team = getTeam(teamId, chatId);
 
     if (user === undefined) {
       reject('Error adding score: invalid user');
@@ -56,7 +56,9 @@ module.exports.addTeamScore = function(teamId, score, userId) {
       return;
     }
     
-    db.get('teams')
+    db.get("chats")
+      .find(chatId)
+      .get('teams')
       .find({ id: teamId })
       .set('score', team.score + score)
       .write();
@@ -70,17 +72,21 @@ module.exports.addTeamScore = function(teamId, score, userId) {
  *
  * @param {string} targetId - ID of  new user.
  * @param {integer} userId - ID of the user invoking this request.
+ * @param {integer} chatId - ID of chat invoking this request.
  */
-module.exports.addUser = function(targetId, userId) {
+module.exports.addUser = function(targetId, userId, chatId) {
+  // TODO: Check if user already in db...
   return new Promise((resolve, reject) => {
-    const user = getUser(userId);
-    
+    const user = getUser(userId, chatId);
+
     if (user === undefined) {
       reject('Error adding user: invalid user');
       return;
     }
     
-    db.get('users')
+    db.get("chats")
+      .find(chatId)
+      .get('users')
       .push({ id: targetId })
       .write();
     
@@ -92,8 +98,8 @@ module.exports.addUser = function(targetId, userId) {
  * Get database.
  * @returns {array} - Array of objects, each is a team.
  */
-module.exports.getTeamsModel = function() {
+module.exports.getTeamsModel = function(chatId) {
   return new Promise((resolve, reject) => {
-    resolve(db.get('teams').value());
+    resolve(db.get('chats').get(chatId).value());
   });
 };
