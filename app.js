@@ -40,6 +40,9 @@ bot.help(ctx => {
   message += 'Add [userId] as admin. User can change scores and add more admins.\n';
   message += '/adduser [userId]\n';
   message += '\n';
+  message += 'Add [TeamName] as a new team with [teamId] as shorthand.\n';
+  message += '/addteam [TeamName] [teamId]\n';
+  message += '\n';
   message += 'Display score.\n';
   message += '/displayscore\n';
   message += '/ds\n';
@@ -48,6 +51,24 @@ bot.help(ctx => {
   message += '/who';
   
   return ctx.reply(message);
+});
+
+// addteam command
+bot.command('addteam', async ctx => {
+  console.log("Adding new team.");
+  
+  const args = ctx.message.text.split(' ');
+  const teamName = args[1];
+  const teamId = args[2];
+  const chatId = ctx.chat.id;
+  
+  try {
+    let res = await Model.addTeam(teamName, teamId, userId, chatId);
+    let message = `*${teamName}* (${teamId}) created.`;
+    return ctx.telegram.sendMessage(ctx.chat.id, message, { parse_mode: 'Markdown', reply_to_message_id: ctx.message.message_id });
+  } catch (err) {
+    return ctx.reply(err);
+  }
 });
 
 // addscore command
