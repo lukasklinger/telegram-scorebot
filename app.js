@@ -14,8 +14,6 @@ bot.telegram.getMe().then(botInfo => {
   bot.options.username = botInfo.username;
 });
 
-// TODO: remove team
-
 // start command
 bot.start(async ctx => {
   console.log("Bot started.");
@@ -45,6 +43,9 @@ bot.help(ctx => {
   message += 'Add [TeamName] as a new team with [teamId] as shorthand.\n';
   message += '/addteam [TeamName] [teamId]\n';
   message += '\n';
+  message += 'Remove [teamId].\n';
+  message += '/removeteam [teamId]\n';
+  message += '\n';
   message += 'Display score.\n';
   message += '/displayscore\n';
   message += '/ds\n';
@@ -53,6 +54,24 @@ bot.help(ctx => {
   message += '/who';
   
   return ctx.reply(message);
+});
+
+// removeteam command
+bot.command('removeteam', async ctx => {
+  console.log("Removing a team.");
+  
+  const args = ctx.message.text.split(' ');
+  const teamId = args[1];
+  const userId = ctx.from.id;
+  const chatId = ctx.chat.id;
+  
+  try {
+    let res = await Model.removeTeam(teamId, userId, chatId);
+    let message = `*${res.team.name}* (${teamId}) removed.`;
+    return ctx.telegram.sendMessage(ctx.chat.id, message, { parse_mode: 'Markdown', reply_to_message_id: ctx.message.message_id });
+  } catch (err) {
+    return ctx.reply(err);
+  }
 });
 
 // addteam command
@@ -70,7 +89,6 @@ bot.command('addteam', async ctx => {
     let message = `*${teamName}* (${teamId}) created.`;
     return ctx.telegram.sendMessage(ctx.chat.id, message, { parse_mode: 'Markdown', reply_to_message_id: ctx.message.message_id });
   } catch (err) {
-    console.log("error: " + err);
     return ctx.reply(err);
   }
 });

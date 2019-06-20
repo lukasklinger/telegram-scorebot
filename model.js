@@ -33,7 +33,7 @@ module.exports.addNewChat = function(chatId, userId) {
 };
 
 /**
- * Add score to a team.
+ * Add a team.
  * @param {string} teamId - ID of the team to add the score.
  * @param {integer} score - Score to be added.
  * @param {integer} userId - ID of the user invoking this request.
@@ -71,6 +71,50 @@ module.exports.addTeam = function(teamName, teamId, userId, chatId) {
       .write();
     
     resolve();
+  });
+};
+
+/**
+ * Remove a team.
+ * @param {string} teamId - ID of the team to add the score.
+ * @param {integer} score - Score to be added.
+ * @param {integer} userId - ID of the user invoking this request.
+ * @param {integer} chatId - ID of chat invoking this request.
+ * @returns {object} - Removed team object.
+ */
+module.exports.removeTeam = function(teamId, userId, chatId) {
+  return new Promise((resolve, reject) => {
+    const user = getUser(userId, chatId);
+    const chat = getChat(chatId);
+    const team = getTeam(teamId, chatId);
+
+    if (teamId === undefined){
+      reject('Please enter a team id.');
+      return;
+    }
+    
+    if(team === undefined){
+      reject('This team ID does not exist.');
+      return;
+    }
+    
+    if (user === undefined) {
+      reject('Error adding score: invalid user');
+      return;
+    }
+    
+    if (chat === undefined) {
+      reject('Please /start the bot first.');
+      return;
+    }
+    
+    db.get("chats")
+      .find({ id: chatId })
+      .get('teams')
+      .remove({ id: teamId })
+      .write();
+    
+    resolve({ team });
   });
 };
 
