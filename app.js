@@ -16,15 +16,8 @@ bot.telegram.getMe().then(botInfo => {
 
 // start command
 bot.start(ctx => {
-  let message = '';
-  message += 'Hello! I can help you keep track of scores. You can control me by sending me these commands.\n';
-  message += '\n';
-  message += '/addteamscore - add team score\n';
-  message += '/addsoloscore - add solo score\n';
-  message += '/adduser - add user\n';
-  message += '/help - show detailed help\n';
-  message += '/displayscore - display score\n';
-  message += '/who - get user ID\n';
+  let message = 'Hello! I can help keep track of scores for you!\n';
+  message += 'For available commands, type /help.';
   
   console.log("Bot started.");
   return ctx.reply(message);
@@ -41,20 +34,15 @@ bot.help(ctx => {
   message += '/addsoloscore [teamId] [soloId] [score]\n';
   message += '/s [teamId] [soloId] [score]\n';
   message += '\n';
-  message += 'Add [userId].\n';
+  message += 'Add [userId] as admin. User can change scores and add more admins.\n';
   message += '/adduser [userId]\n';
-  message += '/u [teamId] [soloId] [score]\n';
-  message += '\n';
-  message += 'Show this detailed helpsheet.\n';
-  message += '/help\n';
   message += '\n';
   message += 'Display score.\n';
   message += '/displayscore\n';
   message += '/ds\n';
   message += '\n';
   message += 'Get user ID.\n';
-  message += '/who\n';
-  message += '\n';
+  message += '/who';
   
   console.log("Help requested.");
   return ctx.reply(message);
@@ -99,7 +87,7 @@ bot.command(['addsoloscore', 's'], async ctx => {
 });
 
 // adduser command
-bot.command(['adduser', 'u'], async ctx => {
+bot.command('adduser', async ctx => {
   const args = ctx.message.text.split(' ');
   const targetId = Number(args[1]);
   const userId = ctx.from.id;
@@ -139,4 +127,4 @@ bot.command('who', async ctx => {
 
 // start bot
 bot.startPolling();
-console.log("Bot started.");
+console.log("Bot polling.");
