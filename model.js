@@ -40,10 +40,14 @@ module.exports.addNewChat = function(chatId, userId) {
  * @param {integer} chatId - ID of chat invoking this request.
  */
 module.exports.addTeam = function(teamName, teamId, userId, chatId) {
-  // TODO: check if team id already exists
   return new Promise((resolve, reject) => {
     const user = getUser(userId, chatId);
     const chat = getChat(chatId);
+
+    if(getTeam(teamId, chatId) != undefined){
+      reject('This team ID already exists.');
+      return;
+    }
 
     if (teamName === undefined || teamId === undefined){
       reject('Please define a team name and id.');

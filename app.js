@@ -14,6 +14,8 @@ bot.telegram.getMe().then(botInfo => {
   bot.options.username = botInfo.username;
 });
 
+// TODO: remove team
+
 // start command
 bot.start(async ctx => {
   console.log("Bot started.");
