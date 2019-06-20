@@ -1,16 +1,14 @@
 {
   "teams": [
     {
-      "id": "d",
-      "name": "Denise",
-      "score": 0,
-      "solos": []
+      "id": "one",
+      "name": "Team 1",
+      "score": 0
     },
     {
-      "id": "m",
-      "name": "Moni",
-      "score": 0,
-      "solos": []
+      "id": "two",
+      "name": "Team 2",
+      "score": 0
     }
   ],
   "users": [

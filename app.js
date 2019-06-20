@@ -16,23 +16,21 @@ bot.telegram.getMe().then(botInfo => {
 
 // start command
 bot.start(ctx => {
+  console.log("Bot started.");
+  
   let message = 'Hello! I can help keep track of scores for you!\n';
   message += 'For available commands, type /help.';
   
-  console.log("Bot started.");
   return ctx.reply(message);
 });
 
 // help command
 bot.help(ctx => {
-  let message = '';
-  message += 'Add [score] to [teamId].\n';
-  message += '/addteamscore [teamId] [score]\n';
-  message += '/t [teamId] [score]\n';
-  message += '\n';
-  message += 'Add [score] to [soloId] from [teamId].\n';
-  message += '/addsoloscore [teamId] [soloId] [score]\n';
-  message += '/s [teamId] [soloId] [score]\n';
+  console.log("Help requested.");
+  
+  let message = 'Add [score] to [Id].\n';
+  message += '/addscore [Id] [score]\n';
+  message += '/t [Id] [score]\n';
   message += '\n';
   message += 'Add [userId] as admin. User can change scores and add more admins.\n';
   message += '/adduser [userId]\n';
@@ -44,42 +42,22 @@ bot.help(ctx => {
   message += 'Get user ID.\n';
   message += '/who';
   
-  console.log("Help requested.");
   return ctx.reply(message);
 });
 
-// addteamscore command
-bot.command(['addteamscore', 't'], async ctx => {
+// addscore command
+bot.command(['addscore', 't'], async ctx => {
+  console.log("Adding score.");
+  
   const args = ctx.message.text.split(' ');
   const teamId = args[1];
   const score = Number(args[2]);
   const userId = ctx.from.id;
-  
-  console.log("Adding team score.");
  
   try {
     const res = await Model.addTeamScore(teamId, score, userId);
-    const newScore = res.team.solos.reduce((accumulator, solo) => accumulator + solo.score, res.team.score);
+    const newScore = res.team.score;
     const message = `*${res.team.name}* has *${newScore}* points.`;
-    return ctx.telegram.sendMessage(ctx.chat.id, message, { parse_mode: 'Markdown', reply_to_message_id: ctx.message.message_id });
-  } catch (err) {
-    return ctx.reply(err);
-  }
-});
-
-// addsoloscore command
-bot.command(['addsoloscore', 's'], async ctx => {
-  const args = ctx.message.text.split(' ');
-  const teamId = args[1];
-  const soloId = args[2];
-  const score = Number(args[3]);
-  const userId = ctx.from.id;
-  
-  console.log("Adding solo score.");
-  
-  try {
-    const res = await Model.addSoloScore(teamId, soloId, score, userId);
-    const message = `*${res.solo.name}* from *${res.team.name}* has *${res.solo.score} points*`;
     return ctx.telegram.sendMessage(ctx.chat.id, message, { parse_mode: 'Markdown', reply_to_message_id: ctx.message.message_id });
   } catch (err) {
     return ctx.reply(err);
@@ -88,11 +66,11 @@ bot.command(['addsoloscore', 's'], async ctx => {
 
 // adduser command
 bot.command('adduser', async ctx => {
+  console.log("Adding another user.");
+  
   const args = ctx.message.text.split(' ');
   const targetId = Number(args[1]);
   const userId = ctx.from.id;
-  
-  console.log("Adding another user.");
   
   try {
     const newScore = await Model.addUser(targetId, userId);
@@ -108,14 +86,12 @@ bot.command(['displayscore', 'ds'], async ctx => {
   console.log("Getting score.");
   
   const teamsModel = await Model.getTeamsModel();
-  const teamsMessage = teamsModel.map(team => {
-    const totalScore = team.solos.reduce((score, solo) => score + solo.score, team.score);
-    return team.solos.reduce((accumulator, solo) => {
-      return `${accumulator}\n${solo.name} (${solo.id}) - \`${solo.score}\``;
-    }, `*${team.name} (${team.id}) - ${totalScore} = ${totalScore - team.score} + ${team.score}*`);
-  });
+  let message = "Current score: \n";
   
-  const message = teamsMessage.reduce((accumulator, mess) => `${accumulator}\n\n${mess}`);
+  teamsModel.forEach(function (team) {
+    message += `${team.name} (${team.id}) - *${team.score}*\n`;
+  });
+
   return ctx.replyWithMarkdown(message);
 });
 
