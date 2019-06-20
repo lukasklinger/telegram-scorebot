@@ -1,16 +1,13 @@
-// REQUIREMENTS
-
-const dotenv = require('dotenv');
-const express = require('express');
 const Telegraf = require('telegraf');
 const Model = require('./model');
 
-// DOTENV SETUP
+// checking for token
+if(process.env.BOT_TOKEN == undefined){
+  console.log("No Telegram bot token set.");
+  process.exit();
+}
 
-dotenv.config();
-
-// BOT SETUP
-
+// setting up bot
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 bot.telegram.getMe().then(botInfo => {
@@ -18,7 +15,6 @@ bot.telegram.getMe().then(botInfo => {
 });
 
 // START COMMAND
-
 bot.start(ctx => {
   let message = '';
   message += 'Hello! I can help you keep track of scores. You can control me by sending me these commands.\n';
@@ -33,7 +29,6 @@ bot.start(ctx => {
 });
 
 // HELP COMMAND
-
 bot.help(ctx => {
   let message = '';
   message += 'Add [score] to [teamId].\n';
@@ -62,7 +57,6 @@ bot.help(ctx => {
 });
 
 // ADDTEAMSCORE COMMAND
-
 bot.command(['addteamscore', 't'], async ctx => {
   const args = ctx.message.text.split(' ');
   const teamId = args[1];
@@ -80,7 +74,6 @@ bot.command(['addteamscore', 't'], async ctx => {
 });
 
 // ADDSOLOSCORE COMMAND
-
 bot.command(['addsoloscore', 's'], async ctx => {
   const args = ctx.message.text.split(' ');
   const teamId = args[1];
@@ -98,7 +91,6 @@ bot.command(['addsoloscore', 's'], async ctx => {
 });
 
 // ADDUSER COMMAND
-
 bot.command(['adduser', 'u'], async ctx => {
   const args = ctx.message.text.split(' ');
   const targetId = Number(args[1]);
@@ -114,7 +106,6 @@ bot.command(['adduser', 'u'], async ctx => {
 });
 
 // DISPLAYSCORE COMMAND
-
 bot.command(['displayscore', 'ds'], async ctx => {
   const teamsModel = await Model.getTeamsModel();
   const teamsMessage = teamsModel.map(team => {
@@ -129,11 +120,9 @@ bot.command(['displayscore', 'ds'], async ctx => {
 });
 
 // WHO COMMAND
-
 bot.command('who', async ctx => {
   return ctx.replyWithMarkdown(`${ctx.from.first_name} your ID is \`${ctx.from.id}\``);
 });
 
 // BOT POLL
-
 bot.startPolling()

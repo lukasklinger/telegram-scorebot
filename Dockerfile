@@ -9,5 +9,4 @@ RUN npm install
 
 VOLUME /usr/src/app/data
 
-CMD [ "node", "server" ]
-
+CMD [ "node", "app" ]
