@@ -12,6 +12,24 @@ function getTeam(teamId) {
 }
 
 /**
+ * Add new chat and admin to database.
+ */
+module.exports.addNewChat = function(chatId, userId) {
+  return new Promise((resolve, reject) => {
+    // check if chat already exists
+    if(db.get("chats").find({ id: chatId }).value() != undefined){
+      resolve(false);
+    } else {
+      db.get("chats")
+        .push({ id: chatId, teams: [], users: [{ id: userId }]})
+        .write();
+      
+      resolve(true);
+    }
+  });
+};
+
+/**
  * Add score to a team.
  * @param {string} teamId - ID of the team to add the score.
  * @param {integer} score - Score to be added.

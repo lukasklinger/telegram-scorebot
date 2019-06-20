@@ -15,11 +15,16 @@ bot.telegram.getMe().then(botInfo => {
 });
 
 // start command
-bot.start(ctx => {
+bot.start(async ctx => {
   console.log("Bot started.");
+  let message = '';
   
-  let message = 'Hello! I can help keep track of scores for you!\n';
-  message += 'For available commands, type /help.';
+  if(await Model.addNewChat(ctx.chat.id, ctx.from.id)){
+    message += 'Hello! I can help keep track of scores for you!\n';
+    message += 'For available commands, type /help.';
+  } else {
+    message += 'I was already running. :)';
+  }
   
   return ctx.reply(message);
 });

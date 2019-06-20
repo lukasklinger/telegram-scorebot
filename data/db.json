@@ -1,19 +1,24 @@
 {
-  "teams": [
+  "chats": [
     {
-      "id": "one",
-      "name": "Team 1",
-      "score": 0
-    },
-    {
-      "id": "two",
-      "name": "Team 2",
-      "score": 0
-    }
-  ],
-  "users": [
-    {
-      "id": 0
+      "id": 0,
+      "teams": [
+        {
+          "id": "one",
+          "name": "Team 1",
+          "score": 0
+        },
+        {
+          "id": "two",
+          "name": "Team 2",
+          "score": 0
+        }
+      ],
+      "users": [
+        {
+          "id": 0
+        }
+      ]
     }
   ]
 }
