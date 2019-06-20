@@ -14,7 +14,7 @@ bot.telegram.getMe().then(botInfo => {
   bot.options.username = botInfo.username;
 });
 
-// START COMMAND
+// start command
 bot.start(ctx => {
   let message = '';
   message += 'Hello! I can help you keep track of scores. You can control me by sending me these commands.\n';
@@ -25,10 +25,12 @@ bot.start(ctx => {
   message += '/help - show detailed help\n';
   message += '/displayscore - display score\n';
   message += '/who - get user ID\n';
+  
+  console.log("Bot started.");
   return ctx.reply(message);
 });
 
-// HELP COMMAND
+// help command
 bot.help(ctx => {
   let message = '';
   message += 'Add [score] to [teamId].\n';
@@ -53,15 +55,19 @@ bot.help(ctx => {
   message += 'Get user ID.\n';
   message += '/who\n';
   message += '\n';
+  
+  console.log("Help requested.");
   return ctx.reply(message);
 });
 
-// ADDTEAMSCORE COMMAND
+// addteamscore command
 bot.command(['addteamscore', 't'], async ctx => {
   const args = ctx.message.text.split(' ');
   const teamId = args[1];
   const score = Number(args[2]);
   const userId = ctx.from.id;
+  
+  console.log("Adding team score.");
  
   try {
     const res = await Model.addTeamScore(teamId, score, userId);
@@ -73,13 +79,15 @@ bot.command(['addteamscore', 't'], async ctx => {
   }
 });
 
-// ADDSOLOSCORE COMMAND
+// addsoloscore command
 bot.command(['addsoloscore', 's'], async ctx => {
   const args = ctx.message.text.split(' ');
   const teamId = args[1];
   const soloId = args[2];
   const score = Number(args[3]);
   const userId = ctx.from.id;
+  
+  console.log("Adding solo score.");
   
   try {
     const res = await Model.addSoloScore(teamId, soloId, score, userId);
@@ -90,11 +98,13 @@ bot.command(['addsoloscore', 's'], async ctx => {
   }
 });
 
-// ADDUSER COMMAND
+// adduser command
 bot.command(['adduser', 'u'], async ctx => {
   const args = ctx.message.text.split(' ');
   const targetId = Number(args[1]);
   const userId = ctx.from.id;
+  
+  console.log("Adding another user.");
   
   try {
     const newScore = await Model.addUser(targetId, userId);
@@ -105,8 +115,10 @@ bot.command(['adduser', 'u'], async ctx => {
   }
 });
 
-// DISPLAYSCORE COMMAND
+// displayscore command
 bot.command(['displayscore', 'ds'], async ctx => {
+  console.log("Getting score.");
+  
   const teamsModel = await Model.getTeamsModel();
   const teamsMessage = teamsModel.map(team => {
     const totalScore = team.solos.reduce((score, solo) => score + solo.score, team.score);
@@ -119,10 +131,12 @@ bot.command(['displayscore', 'ds'], async ctx => {
   return ctx.replyWithMarkdown(message);
 });
 
-// WHO COMMAND
+// who command
 bot.command('who', async ctx => {
+  console.log("Getting user ID.");
   return ctx.replyWithMarkdown(`${ctx.from.first_name} your ID is \`${ctx.from.id}\``);
 });
 
-// BOT POLL
-bot.startPolling()
+// start bot
+bot.startPolling();
+console.log("Bot started.");
