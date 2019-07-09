@@ -157,6 +157,15 @@ bot.command('who', async ctx => {
   return ctx.replyWithMarkdown(`${ctx.from.first_name} your ID is \`${ctx.from.id}\``);
 });
 
+
+// function will restart polling if ever it fails
+function restartBot() {
+  bot.startPolling(30, 100, null, (d) => {
+    console.log('Trying to restart polling.');
+    restartBot();
+  });
+}
+
 // start bot
-bot.startPolling();
+restartBot();
 console.log("Bot polling.");
