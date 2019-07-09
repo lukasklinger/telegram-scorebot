@@ -14,6 +14,9 @@ bot.telegram.getMe().then(botInfo => {
   bot.options.username = botInfo.username;
 });
 
+// enable bot logging
+bot.use(Telegraf.log())
+
 // start command
 bot.start(async ctx => {
   console.log("Bot started.");
@@ -155,5 +158,5 @@ bot.command('who', async ctx => {
 });
 
 // start bot
-bot.startPolling();
+bot.launch();
 console.log("Bot polling.");
