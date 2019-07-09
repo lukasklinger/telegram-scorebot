@@ -7,14 +7,11 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "lowdb": "^1.0.0",
-    "telegraf": "^3.21.2"
-  },
-  "engines": {
-    "node": "8.x"
+    "lowdb": "*",
+    "telegraf": "*"
   },
   "repository": {
-    "url": "https://github.com/nexolute/telegram-scorebot"
+    "url": "https://git.lukasklinger.com/lukas/telegram-scorebot"
   },
   "license": "MIT",
   "keywords": [
