@@ -1,5 +1,6 @@
 # telegram-scorebot
 A simple Telegram bot that can keep a score in a group.
+A public instance is running here: https://t.me/keeping_score_bot
 
 ## How To Use
 1. Add the bot to your group.
