@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "A telegram bot to keep track of score",
   "main": "app.js",
+  "author": "Lukas Klinger <lukas.klinger@gmail.com> (https://lukasklinger.com)",
   "scripts": {
     "start": "node server.js"
   },

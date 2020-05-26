@@ -1,7 +1,12 @@
 # telegram-scorebot
-Ein Telegram-Bot, der Punkte zählt.
+A simple Telegram bot that can keep a score in a group.
 
-# Running manually
+## How To Use
+1. Add the bot to your group.
+2. Type '/start'.
+3. Type '/help' for more info.
+
+## Running manually
 1. Run `npm install`
 2. Set environment variable `BOT_TOKEN`
 3. Run `node app`

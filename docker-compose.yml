@@ -5,6 +5,9 @@ services:
     build: .
     restart: unless-stopped
     volumes:
-      - scorebot:/usr/src/app/data
+      - scorebot-data:/usr/src/app/data
     environment:
       - BOT_TOKEN=[insert telegram bot token here]
+
+volumes:
+  scorebot-data:
