@@ -1,171 +1,135 @@
-const Telegraf = require('telegraf');
-const Model = require('./model');
-
-// checking for token
-if(process.env.BOT_TOKEN == undefined){
-  console.log("No Telegram bot token set.");
-  process.exit();
-}
+const Telebot = require('telebot')
+const Model = require('./model')
 
 // setting up bot
-const bot = new Telegraf(process.env.BOT_TOKEN);
-
-bot.telegram.getMe().then(botInfo => {
-  bot.options.username = botInfo.username;
-});
-
-// enable bot logging
-bot.use(Telegraf.log());
+const bot = new Telebot(process.env.BOT_TOKEN)
 
 // start command
-bot.start(async ctx => {
-  console.log("Bot started.");
-  let message = '';
+bot.on('/start', async (msg) => {
+  let message = ''
   
-  if(await Model.addNewChat(ctx.chat.id, ctx.from.id)){
-    message += 'Hello! I can help keep track of scores for you!\n';
-    message += 'For available commands, type /help.';
+  if(await Model.addNewChat(msg.chat.id, msg.from.id)){
+    message += 'Hello! I can help keep track of scores for you!\n'
+    message += 'For available commands, type /help.'
   } else {
-    message += 'I was already running. :)';
+    message += 'I was already running. :)'
   }
   
-  return ctx.reply(message);
-});
+  msg.reply.text(message)
+})
 
 // help command
-bot.help(ctx => {
-  console.log("Help requested.");
+bot.on('/help', (msg) => {
+  let message = 'Add [score] to [Id].\n'
+  message += '/addscore [Id] [score]\n'
+  message += '/t [Id] [score]\n'
+  message += '\n'
+  message += 'Add [userId] as admin. User can change scores and add more admins.\n'
+  message += '/adduser [userId]\n'
+  message += '\n'
+  message += 'Add [TeamName] as a new team with [teamId] as shorthand.\n'
+  message += '/addteam [TeamName] [teamId]\n'
+  message += '\n'
+  message += 'Remove [teamId].\n'
+  message += '/removeteam [teamId]\n'
+  message += '\n'
+  message += 'Display score.\n'
+  message += '/displayscore\n'
+  message += '/ds\n'
+  message += '\n'
+  message += 'Get user ID.\n'
+  message += '/who'
   
-  let message = 'Add [score] to [Id].\n';
-  message += '/addscore [Id] [score]\n';
-  message += '/t [Id] [score]\n';
-  message += '\n';
-  message += 'Add [userId] as admin. User can change scores and add more admins.\n';
-  message += '/adduser [userId]\n';
-  message += '\n';
-  message += 'Add [TeamName] as a new team with [teamId] as shorthand.\n';
-  message += '/addteam [TeamName] [teamId]\n';
-  message += '\n';
-  message += 'Remove [teamId].\n';
-  message += '/removeteam [teamId]\n';
-  message += '\n';
-  message += 'Display score.\n';
-  message += '/displayscore\n';
-  message += '/ds\n';
-  message += '\n';
-  message += 'Get user ID.\n';
-  message += '/who';
-  
-  return ctx.reply(message);
-});
+  msg.reply.text(message)
+})
 
 // removeteam command
-bot.command('removeteam', async ctx => {
-  console.log("Removing a team.");
-  
-  const args = ctx.message.text.split(' ');
-  const teamId = args[1];
-  const userId = ctx.from.id;
-  const chatId = ctx.chat.id;
+bot.on('/removeteam', async (msg) => {
+  let args = msg.text.split(' ')
+  let teamId = args[1]
+  let userId = msg.from.id
+  let chatId = msg.chat.id
   
   try {
-    let res = await Model.removeTeam(teamId, userId, chatId);
-    let message = `*${res.team.name}* (${teamId}) removed.`;
-    return ctx.telegram.sendMessage(ctx.chat.id, message, { parse_mode: 'Markdown', reply_to_message_id: ctx.message.message_id });
+    let res = await Model.removeTeam(teamId, userId, chatId)
+    let message = `*${res.team.name}* (${teamId}) removed.`
+    msg.reply.text(message)
   } catch (err) {
-    return ctx.reply(err);
+    msg.reply.text(err)
   }
-});
+})
 
 // addteam command
-bot.command('addteam', async ctx => {
-  console.log("Adding new team.");
-  
-  const args = ctx.message.text.split(' ');
-  const teamName = args[1];
-  const teamId = args[2];
-  const userId = ctx.from.id;
-  const chatId = ctx.chat.id;
+bot.on('/addteam', async (msg) => {
+  let args = msg.text.split(' ')
+  let teamName = args[1]
+  let teamId = args[2]
+  let userId = msg.from.id
+  let chatId = msg.chat.id
   
   try {
-    let res = await Model.addTeam(teamName, teamId, userId, chatId);
-    let message = `*${teamName}* (${teamId}) created.`;
-    return ctx.telegram.sendMessage(ctx.chat.id, message, { parse_mode: 'Markdown', reply_to_message_id: ctx.message.message_id });
+    await Model.addTeam(teamName, teamId, userId, chatId)
+    let message = `*${teamName}* (${teamId}) created.`
+    msg.reply.text(message)
   } catch (err) {
-    return ctx.reply(err);
+    msg.reply.text(err)
   }
-});
+})
 
 // addscore command
-bot.command(['addscore', 't'], async ctx => {
-  console.log("Adding score.");
-  
-  const args = ctx.message.text.split(' ');
-  const teamId = args[1];
-  const score = Number(args[2]);
-  const userId = ctx.from.id;
-  const chatId = ctx.chat.id;
+bot.on(['/addscore', '/t'], async (msg) => {
+  let args = msg.text.split(' ')
+  let teamId = args[1]
+  let score = Number(args[2])
+  let userId = msg.from.id
+  let chatId = msg.chat.id
  
   try {
-    const res = await Model.addTeamScore(teamId, score, userId, chatId);
-    const message = `*${res.team.name}* has *${res.team.score}* points.`;
-    return ctx.telegram.sendMessage(ctx.chat.id, message, { parse_mode: 'Markdown', reply_to_message_id: ctx.message.message_id });
+    let res = await Model.addTeamScore(teamId, score, userId, chatId)
+    let message = `*${res.team.name}* has *${res.team.score}* points.`
+    msg.reply.text(message)
   } catch (err) {
-    return ctx.reply(err);
+    msg.reply.text(err)
   }
-});
+})
 
 // adduser command
-bot.command('adduser', async ctx => {
-  console.log("Adding another user.");
-  
-  const args = ctx.message.text.split(' ');
-  const targetId = Number(args[1]);
-  const userId = ctx.from.id;
-  const chatId = ctx.chat.id;
+bot.on('/adduser', async (msg) => {
+  let args = msg.text.split(' ')
+  let targetId = Number(args[1])
+  let userId = msg.from.id
+  let chatId = msg.chat.id
   
   try {
-    await Model.addUser(targetId, userId, chatId);
-    const message = `User ${targetId} has been added`;
-    return ctx.reply(message);
+    await Model.addUser(targetId, userId, chatId)
+    let message = `User ${targetId} has been added`
+    msg.reply.text(message)
   } catch (err) {
-    return ctx.reply(err);
+    msg.reply.text(err)
   }
-});
+})
 
 // displayscore command
-bot.command(['displayscore', 'ds'], async ctx => {
-  console.log("Getting score.");
-  
-  const teamsModel = await Model.getTeamsModel(ctx.chat.id);
-  let message = "Current score: \n";
+bot.on(['/displayscore', '/ds'], async (msg) => {
+  let teamsModel = await Model.getTeamsModel(msg.chat.id)
+  let message = "Current score: \n"
   
   if(teamsModel != undefined){
     teamsModel.forEach(function (team) {
-      message += `${team.name} (${team.id}): *${team.score}*\n`;
+      message += `${team.name} (${team.id}): *${team.score}*\n`
     });
   } else {
-    message += "No scores yet.";
+    message += "No scores yet."
   }
 
-  return ctx.replyWithMarkdown(message);
-});
+  msg.reply.text(message)
+})
 
 // who command
-bot.command('who', async ctx => {
-  console.log("Getting user ID.");
-  return ctx.replyWithMarkdown(`${ctx.from.first_name} your ID is \`${ctx.from.id}\``);
-});
-
-
-// function will restart polling if ever it fails
-function restartBot() {
-  bot.startPolling(30, 100, null, (d) => {
-    console.log('Trying to restart polling.');
-    restartBot();
-  });
-}
+bot.on('/who', (msg) => {
+  msg.reply.text(`${msg.from.first_name} your ID is \`${msg.from.id}\``)
+})
 
 // start bot
-restartBot();
-console.log("Bot polling.");
+bot.start()
+console.log("Bot polling.")

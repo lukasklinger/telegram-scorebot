@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "lowdb": "*",
-    "telegraf": "*"
+    "telebot": "^1.4.1"
   },
   "repository": {
     "url": "https://git.lukasklinger.com/lukas/telegram-scorebot"
