@@ -7,7 +7,7 @@ services:
     volumes:
       - scorebot-data:/usr/src/app/data
     environment:
-      - BOT_TOKEN=[insert telegram bot token here]
+      - BOT_TOKEN=5161567991:AAGa6kyNURytAjAN7bLzcGyR_bUU_LqVHNM
 
 volumes:
   scorebot-data:
